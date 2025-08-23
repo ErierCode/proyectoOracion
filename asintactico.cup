@@ -59,10 +59,10 @@ parser code {:
    tienen un valor como los enteros son listados en la segunda o demas lineas. */
 
 //SIMBOLOS TERMINALES QUE VIENEN DEL ANALIZADOR LÉXICO
-terminal String    ARTICULO_EL, ARTICULO_LA; //Articulos
-terminal String    NOMBRE_NINA, NOMBRE_NINO, NOMBRE_CARRO; //nombres
-terminal String    VERBO_ES, VERBO_CORRE; //Verbos
-terminal String    ADJ_OBDIENTE, ADJ_BONITA, ADJ_RAPIDO, PUNTOYCOMA; //Adjetivos o complementos
+terminal String    ARTICULO_EL, ARTICULO_LA, ARTICULO_LOS; //Articulos
+terminal String    NOMBRE_NINA, NOMBRE_NINO, NOMBRE_CARRO, NOMBRE_PERRO, NOMBRE_NIÑOS; //nombres
+terminal String    VERBO_ES, VERBO_CORRE, VERBO_LADRO, VERBO_ESTARAN; //Verbos
+terminal String    ADJ_OBDIENTE, ADJ_BONITA, ADJ_RAPIDO, ADJ_FUERTE, ADJ_BIEN, PUNTOYCOMA; //Adjetivos o complementos
 
 //SIMBOLOS NO TERMINALES, QUE CREAN MIS PRODUCCIONES O DERIVACIONES
 non terminal Object  cuerpo, oracion1, oracion, sujeto, predicado, articulo, nombre, verbo, complemento;
@@ -87,6 +87,11 @@ articulo  ::= ARTICULO_EL:a
                    ARTICULO_LA:a
                   {:
                     RESULT=a;
+                  :}
+                  |
+                   ARTICULO_LOS:a
+                  {:
+                    RESULT=a;
                   :};
 
 nombre  ::= NOMBRE_NINO:a
@@ -100,7 +105,15 @@ nombre  ::= NOMBRE_NINO:a
                   |NOMBRE_CARRO:a
                   {: 
                     RESULT=a;
-                  :};  
+                  :}
+                  |NOMBRE_PERRO:a
+                  {: 
+                    RESULT=a;
+                  :}
+                  |NOMBRE_NIÑOS:a
+                  {: 
+                    RESULT=a;
+                  :};
 
 predicado ::= verbo complemento;
 
@@ -109,6 +122,14 @@ verbo ::= VERBO_ES:a
                     RESULT=a;
                   :} 
                   | VERBO_CORRE:a 
+                  {: 
+                    RESULT=a;
+                  :}
+                  | VERBO_LADRO:a 
+                  {: 
+                    RESULT=a;
+                  :}
+                  | VERBO_ESTARAN:a 
                   {: 
                     RESULT=a;
                   :};
@@ -122,6 +143,14 @@ complemento ::= ADJ_OBDIENTE:a
                     RESULT=a;
                   :}
                   | ADJ_RAPIDO:a
+                  {: 
+                    RESULT=a;
+                  :}
+                  | ADJ_FUERTE:a
+                  {: 
+                    RESULT=a;
+                  :}
+                  | ADJ_BIEN:a
                   {: 
                     RESULT=a;
                   :};

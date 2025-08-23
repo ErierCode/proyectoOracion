@@ -101,6 +101,8 @@ NumReal=({Entero}+) "." ({Entero}*)
     "la"  | "La"          {  System.out.print(" la ");
                           return symbol(sym.ARTICULO_LA); }
 
+    "los"  | "Los"          {  System.out.print(" los ");
+                          return symbol(sym.ARTICULO_LOS); }
 
     "niña"               {  System.out.print(" niña ");
                           return symbol(sym.NOMBRE_NINA); }
@@ -108,7 +110,11 @@ NumReal=({Entero}+) "." ({Entero}*)
     "niño"               {  System.out.print(" niño ");
                           return symbol(sym.NOMBRE_NINO); }
     "carro"           {  System.out.print(" carro ");
-                          return symbol(sym.NOMBRE_CARRO); }                      
+                          return symbol(sym.NOMBRE_CARRO); }
+    "perro"             {  System.out.print(" perro ");
+                          return symbol(sym.NOMBRE_PERRO); }
+    "niños"             {  System.out.print(" niños ");
+                          return symbol(sym.NOMBRE_NIÑOS); }
 
 
     "es"               {  System.out.print(" es ");
@@ -116,6 +122,12 @@ NumReal=({Entero}+) "." ({Entero}*)
 
     "corre"               {  System.out.print(" corre ");
                           return symbol(sym.VERBO_CORRE); }
+        
+    "ladro"               {  System.out.print(" ladro ");
+                          return symbol(sym.VERBO_LADRO); }
+
+    "estaran"               {  System.out.print(" estaran ");
+                          return symbol(sym.VERBO_ESTARAN); }
 
 
     "obediente"               {  System.out.print(" obediente ");
@@ -125,7 +137,13 @@ NumReal=({Entero}+) "." ({Entero}*)
                           return symbol(sym.ADJ_BONITA); }   
 
     "rapido"               {  System.out.print(" rapido ");
-                          return symbol(sym.ADJ_RAPIDO); }                      
+                          return symbol(sym.ADJ_RAPIDO); }
+
+    "fuerte"               {  System.out.print(" fuerte ");
+                          return symbol(sym.ADJ_FUERTE); }
+
+    "bien"               {  System.out.print(" bien ");
+                          return symbol(sym.ADJ_BIEN); }             
 
     /* No hace nada si encuentra el espacio en blanco */
     {Espacio}       { /* ignora el espacio */ } 
