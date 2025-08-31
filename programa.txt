@@ -1,7 +1,4 @@
-El niña es bonita;
-el niño es obediente;
-el carro es rapido;
-el perro ladro fuerte;
-los perro ladro fuerte;
-los niños estaran bien;
-el niños estaran bien;
+program HolaMundo;
+begin
+  writeln('¡Hola, Mundo!');
+end.

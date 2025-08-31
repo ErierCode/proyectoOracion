@@ -1,4 +1,3 @@
-
 /* --------------------------Codigo de Usuario----------------------- */
 package ejemplocup;
 
@@ -7,149 +6,73 @@ import java.io.Reader;
       
 %% //inicio de opciones
    
-/* ------ Seccion de opciones y declaraciones de JFlex -------------- */  
-   
-/* 
-    Cambiamos el nombre de la clase del analizador a Lexer
-*/
 %class AnalizadorLexico
-
-/*
-    Activar el contador de lineas, variable yyline
-    Activar el contador de columna, variable yycolumn
-*/
 %line
 %column
-    
-/* 
-   Activamos la compatibilidad con Java CUP para analizadores
-   sintacticos(parser)
-*/
 %cup
    
-/*
-    Declaraciones
-
-    El codigo entre %{  y %} sera copiado integramente en el 
-    analizador generado.
-*/
 %{
-    /*  Generamos un java_cup.Symbol para guardar el tipo de token 
-        encontrado */
     private Symbol symbol(int type) {
-        return new Symbol(type, yyline, yycolumn);
+        return new Symbol(type, yyline+1, yycolumn+1);
     }
-    
-    /* Generamos un Symbol para el tipo de token encontrado 
-       junto con su valor */
     private Symbol symbol(int type, Object value) {
-        return new Symbol(type, yyline, yycolumn, value);
+        return new Symbol(type, yyline+1, yycolumn+1, value);
     }
 %}
    
-
-/*
-    Macro declaraciones
-  
-    Declaramos expresiones regulares que despues usaremos en las
-    reglas lexicas.
-*/
-   
-/*  Un salto de linea es un \n, \r o \r\n dependiendo del SO   */
-Salto = \r|\n|\r\n
-   
-/* Espacio es un espacio en blanco, tabulador \t, salto de linea 
-    o avance de pagina \f, normalmente son ignorados */
-Espacio     = {Salto} | [ \t\f]
-   
-/* EXPRESIONES REGULARES */
-Entero = 0 | [1-9][0-9]*
-Identificador =[a-zA-Z][A-Za-z0-9]* 
-NumReal=({Entero}+) "." ({Entero}*)
-
-
-
-
-
+/* ---------------- Macros ---------------- */
+Salto        = \r|\n|\r\n
+Espacio      = {Salto} | [ \t\f]
+Entero       = 0 | [1-9][0-9]*
+Identificador= [a-zA-Z][A-Za-z0-9]*
+NumReal      = {Entero}"."{Entero}+
+Cadena = \'[^\']*\'
 %% //fin de opciones
-/* -------------------- Seccion de reglas lexicas ------------------ */
-   
-/*
-   Esta seccion contiene expresiones regulares y acciones. 
-   Las acciones son código en Java que se ejecutara cuando se
-   encuentre una entrada valida para la expresion regular correspondiente */
-   
-   /* YYINITIAL es el estado inicial del analizador lexico al escanear.
-      Las expresiones regulares solo serán comparadas si se encuentra
-      en ese estado inicial. Es decir, cada vez que se encuentra una 
-      coincidencia el scanner vuelve al estado inicial. Por lo cual se ignoran
-      estados intermedios.*/
-   
+/* -------------------- Reglas lexicas ------------------ */
+
 <YYINITIAL> {
-   
-  
-    /* 							DECLARANDO SIMBOLOS           */
 
-    ";"                {  System.out.print(" ; ");
-                          return symbol(sym.PUNTOYCOMA); }
+    /* -------- PALABRAS RESERVADAS -------- */
+    "program"   { return symbol(sym.PROGRAM); }
+    "begin"     { return symbol(sym.BEGIN); }
+    "end"       { return symbol(sym.END); }
+    "writeln"   { return symbol(sym.WRITELN); }
+    "write"     { return symbol(sym.WRITE); }
+    "uses"      { return symbol(sym.USES); }
+    "var"       { return symbol(sym.VAR); }
+    "const"     { return symbol(sym.CONST); }
 
-    
-    /* 					PALABRAS RESERVADAS 						*/
-    "el" | "El"        {  System.out.print(" el ");
-                          return symbol(sym.ARTICULO_EL); }
+    /* -------- SÍMBOLOS -------- */
+    ";"         { return symbol(sym.SEMI); }
+    ":"         { return symbol(sym.DP); }
+    ","         { return symbol(sym.COMA); }
+    "."         { return symbol(sym.PUNTO); }
+    "("         { return symbol(sym.PA); }
+    ")"         { return symbol(sym.PC); }
+    "="         { return symbol(sym.IGUAL); }
+    "+"         { return symbol(sym.MAS); }
+    "-"         { return symbol(sym.MENOS); }
+    "*"         { return symbol(sym.POR); }
+    "/"         { return symbol(sym.DIV); }
 
-    "la"  | "La"          {  System.out.print(" la ");
-                          return symbol(sym.ARTICULO_LA); }
-
-    "los"  | "Los"          {  System.out.print(" los ");
-                          return symbol(sym.ARTICULO_LOS); }
-
-    "niña"               {  System.out.print(" niña ");
-                          return symbol(sym.NOMBRE_NINA); }
-
-    "niño"               {  System.out.print(" niño ");
-                          return symbol(sym.NOMBRE_NINO); }
-    "carro"           {  System.out.print(" carro ");
-                          return symbol(sym.NOMBRE_CARRO); }
-    "perro"             {  System.out.print(" perro ");
-                          return symbol(sym.NOMBRE_PERRO); }
-    "niños"             {  System.out.print(" niños ");
-                          return symbol(sym.NOMBRE_NIÑOS); }
-
-
-    "es"               {  System.out.print(" es ");
-                          return symbol(sym.VERBO_ES); }
-
-    "corre"               {  System.out.print(" corre ");
-                          return symbol(sym.VERBO_CORRE); }
-        
-    "ladro"               {  System.out.print(" ladro ");
-                          return symbol(sym.VERBO_LADRO); }
-
-    "estaran"               {  System.out.print(" estaran ");
-                          return symbol(sym.VERBO_ESTARAN); }
-
-
-    "obediente"               {  System.out.print(" obediente ");
-                          return symbol(sym.ADJ_OBDIENTE); }
-
-     "bonita"               {  System.out.print(" bonita ");
-                          return symbol(sym.ADJ_BONITA); }   
-
-    "rapido"               {  System.out.print(" rapido ");
-                          return symbol(sym.ADJ_RAPIDO); }
-
-    "fuerte"               {  System.out.print(" fuerte ");
-                          return symbol(sym.ADJ_FUERTE); }
-
-    "bien"               {  System.out.print(" bien ");
-                          return symbol(sym.ADJ_BIEN); }             
-
-    /* No hace nada si encuentra el espacio en blanco */
-    {Espacio}       { /* ignora el espacio */ } 
+    /* -------- LITERALES -------- */
+   {Cadena} {
+    String s = yytext().substring(1, yytext().length()-1); // quitar las comillas
+    return symbol(sym.CADENA, s);
 }
 
+    {NumReal}   { return symbol(sym.NUM, yytext()); }
+    {Entero}    { return symbol(sym.NUM, yytext()); }
+    {Identificador} { return symbol(sym.ID, yytext()); }
 
-/* Si el token contenido en la entrada no coincide con ninguna regla
-    entonces se marca un token ilegal */
-[^]                    { throw new Error("Caracter ilegal <"+yytext()+">"); }
+    /* -------- COMENTARIOS -------- */
+    "//".*                  { /* ignorar */ }
+    "\\{".*?"\\}"           { /* ignorar */ }
+    "\\(\\*"([^*]|\\*+[^)])* "\\*\\)" { /* ignorar */ }
+
+    /* -------- IGNORAR ESPACIOS -------- */
+    {Espacio}   { /* ignora espacios */ }
+}
+
+/* -------- ERROR LÉXICO -------- */
+[^] { throw new Error("Caracter ilegal <"+yytext()+"> en linea "+yyline+", columna "+yycolumn); }

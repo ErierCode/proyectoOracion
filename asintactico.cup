@@ -1,158 +1,91 @@
-   
-   
-/* ---------------Seccion de declaraciones preliminares--------------------*/
+/* -------------------------- Parser Pascal -------------------------- */
 package ejemplocup;
 
-/* Import the class java_cup.runtime.*  */
 import java_cup.runtime.*;
-import java.io.FileReader;
-   
-/* Codigo del parser, se copia integramente a la clase final.
-    Agregamos el manejo de errores. */
+
+/* --------- Código adicional del parser --------- */
 parser code {:
-    
-    /* Reporte de error encontrado. */
     public void report_error(String message, Object info) {
         StringBuilder m = new StringBuilder("Error");
         if (info instanceof java_cup.runtime.Symbol) {
-            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
-            if (s.left >= 0) {                
-                m.append(" in line "+(s.left+1));
+            java_cup.runtime.Symbol s = (java_cup.runtime.Symbol) info;
+            if (s.left >= 0) {
+                m.append(" en línea " + (s.left+1));
                 if (s.right >= 0)
-                    m.append(", column "+(s.right+1));
+                    m.append(", columna " + (s.right+1));
             }
         }
-        m.append(" : "+message);
+        m.append(" : " + message);
         System.err.println(m);
     }
-   
-    /* Cuando se encuentra un error de donde el sistema no puede
-        recuperarse, se lanza un error fatal. Se despliega el mensaje
-        de error y se finaliza la ejecucion. */
+
     public void report_fatal_error(String message, Object info) {
         report_error(message, info);
-        System.exit(1);
+        throw new RuntimeException("Análisis abortado");
     }
 
-    /* Metodo main para garantizar la ejecucion del analizador
-       lexico y sintactico, ademas que se pase como parametro la tabla
-       de simbolos correspondiente. */
-    public static void main(String[] args){
+    public static void main(String[] args) {
         try {
             AnalizadorSintactico asin = new AnalizadorSintactico(
-                    new AnalizadorLexico( new FileReader(args[0])));
+                new AnalizadorLexico(new java.io.FileReader(args[0])));
             Object result = asin.parse().value;
-            System.out.println("\n*** Resultados finales ***");
+            System.out.println("\n✓ Programa Pascal valido");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 :};
-   
 
-   
-/* ------------Declaracion de simbolos terminales y no terminales---------- */
-   
-/* Terminales (tokens obtenidos por el analizador lexico).  
+/* ------------------- TERMINALES ------------------- */
+// Palabras reservadas
+terminal PROGRAM, BEGIN, END, WRITELN, WRITE, USES, VAR, CONST;
 
-   Terminales que no tienen un valor son listados primero, los terminales que
-   tienen un valor como los enteros son listados en la segunda o demas lineas. */
+// Símbolos
+terminal SEMI, DP, COMA, PUNTO, PA, PC, IGUAL, MAS, MENOS, POR, DIV;
 
-//SIMBOLOS TERMINALES QUE VIENEN DEL ANALIZADOR LÉXICO
-terminal String    ARTICULO_EL, ARTICULO_LA, ARTICULO_LOS; //Articulos
-terminal String    NOMBRE_NINA, NOMBRE_NINO, NOMBRE_CARRO, NOMBRE_PERRO, NOMBRE_NIÑOS; //nombres
-terminal String    VERBO_ES, VERBO_CORRE, VERBO_LADRO, VERBO_ESTARAN; //Verbos
-terminal String    ADJ_OBDIENTE, ADJ_BONITA, ADJ_RAPIDO, ADJ_FUERTE, ADJ_BIEN, PUNTOYCOMA; //Adjetivos o complementos
+// Literales
+terminal String ID;
+terminal String CADENA;
+terminal String NUM;
 
-//SIMBOLOS NO TERMINALES, QUE CREAN MIS PRODUCCIONES O DERIVACIONES
-non terminal Object  cuerpo, oracion1, oracion, sujeto, predicado, articulo, nombre, verbo, complemento;
+/* ------------------- NO TERMINALES ------------------- */
+non terminal S, Programa, Bloque, Sentencias, Sentencia, LlamadaWrite, ListaExpr, Expr;
 
-cuerpo  ::= cuerpo  oracion1 | oracion1;
+/* ------------------- PRECEDENCIAS ------------------- */
+precedence left MAS, MENOS;
+precedence left POR, DIV;
 
-oracion1 ::= oracion:e 
-                  {:
-                    System.out.println(" "); 
-                  :}
-                   PUNTOYCOMA;
+/* ------------------- PRODUCCIONES ------------------- */
+start with S;
 
-oracion ::= sujeto predicado;
+S ::= Programa PUNTO;
 
-sujeto ::= articulo nombre;
+Programa ::= PROGRAM ID SEMI Bloque;
 
-articulo  ::= ARTICULO_EL:a
-                  {: 
-                    RESULT=a;
-                  :}
-                  |
-                   ARTICULO_LA:a
-                  {:
-                    RESULT=a;
-                  :}
-                  |
-                   ARTICULO_LOS:a
-                  {:
-                    RESULT=a;
-                  :};
+Bloque ::= BEGIN Sentencias END
+         | BEGIN END
+         ;
 
-nombre  ::= NOMBRE_NINO:a
-                  {: 
-                    RESULT=a;
-                  :}
-                  |NOMBRE_NINA:a
-                  {: 
-                    RESULT=a;
-                  :}
-                  |NOMBRE_CARRO:a
-                  {: 
-                    RESULT=a;
-                  :}
-                  |NOMBRE_PERRO:a
-                  {: 
-                    RESULT=a;
-                  :}
-                  |NOMBRE_NIÑOS:a
-                  {: 
-                    RESULT=a;
-                  :};
+Sentencias ::= Sentencias Sentencia SEMI
+             | Sentencia SEMI
+             ;
 
-predicado ::= verbo complemento;
+Sentencia ::= LlamadaWrite
+            ;
 
-verbo ::= VERBO_ES:a
-                  {: 
-                    RESULT=a;
-                  :} 
-                  | VERBO_CORRE:a 
-                  {: 
-                    RESULT=a;
-                  :}
-                  | VERBO_LADRO:a 
-                  {: 
-                    RESULT=a;
-                  :}
-                  | VERBO_ESTARAN:a 
-                  {: 
-                    RESULT=a;
-                  :};
+LlamadaWrite ::= WRITELN PA ListaExpr PC
+               | WRITE   PA ListaExpr PC
+               ;
 
-complemento ::= ADJ_OBDIENTE:a
-                  {: 
-                    RESULT=a;
-                  :} 
-                  | ADJ_BONITA:a
-                  {: 
-                    RESULT=a;
-                  :}
-                  | ADJ_RAPIDO:a
-                  {: 
-                    RESULT=a;
-                  :}
-                  | ADJ_FUERTE:a
-                  {: 
-                    RESULT=a;
-                  :}
-                  | ADJ_BIEN:a
-                  {: 
-                    RESULT=a;
-                  :};
-                     
+ListaExpr ::= Expr
+            | ListaExpr COMA Expr
+            ;
 
+Expr ::= CADENA
+       | ID
+       | NUM
+       | Expr MAS Expr
+       | Expr MENOS Expr
+       | Expr POR Expr
+       | Expr DIV Expr
+       ;
