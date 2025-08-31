@@ -1,0 +1,91 @@
+/* -------------------------- Parser Pascal -------------------------- */
+package ejemplocup;
+
+import java_cup.runtime.*;
+
+/* --------- Código adicional del parser --------- */
+parser code {:
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Error");
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = (java_cup.runtime.Symbol) info;
+            if (s.left >= 0) {
+                m.append(" en línea " + (s.left+1));
+                if (s.right >= 0)
+                    m.append(", columna " + (s.right+1));
+            }
+        }
+        m.append(" : " + message);
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        throw new RuntimeException("Análisis abortado");
+    }
+
+    public static void main(String[] args) {
+        try {
+            AnalizadorSintactico asin = new AnalizadorSintactico(
+                new AnalizadorLexico(new java.io.FileReader(args[0])));
+            Object result = asin.parse().value;
+            System.out.println("\n✓ Programa Pascal valido");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+:};
+
+/* ------------------- TERMINALES ------------------- */
+// Palabras reservadas
+terminal PROGRAM, BEGIN, END, WRITELN, WRITE, USES, VAR, CONST;
+
+// Símbolos
+terminal SEMI, DP, COMA, PUNTO, PA, PC, IGUAL, MAS, MENOS, POR, DIV;
+
+// Literales
+terminal String ID;
+terminal String CADENA;
+terminal String NUM;
+
+/* ------------------- NO TERMINALES ------------------- */
+non terminal S, Programa, Bloque, Sentencias, Sentencia, LlamadaWrite, ListaExpr, Expr;
+
+/* ------------------- PRECEDENCIAS ------------------- */
+precedence left MAS, MENOS;
+precedence left POR, DIV;
+
+/* ------------------- PRODUCCIONES ------------------- */
+start with S;
+
+S ::= Programa PUNTO;
+
+Programa ::= PROGRAM ID SEMI Bloque;
+
+Bloque ::= BEGIN Sentencias END
+         | BEGIN END
+         ;
+
+Sentencias ::= Sentencias Sentencia SEMI
+             | Sentencia SEMI
+             ;
+
+Sentencia ::= LlamadaWrite
+            ;
+
+LlamadaWrite ::= WRITELN PA ListaExpr PC
+               | WRITE   PA ListaExpr PC
+               ;
+
+ListaExpr ::= Expr
+            | ListaExpr COMA Expr
+            ;
+
+Expr ::= CADENA
+       | ID
+       | NUM
+       | Expr MAS Expr
+       | Expr MENOS Expr
+       | Expr POR Expr
+       | Expr DIV Expr
+       ;
