@@ -24,9 +24,10 @@ import java.io.Reader;
 Salto        = \r|\n|\r\n
 Espacio      = {Salto} | [ \t\f]
 Entero       = 0 | [1-9][0-9]*
-Identificador= [a-zA-Z][A-Za-z0-9]*
 NumReal      = {Entero}"."{Entero}+
-Cadena = \'[^\']*\'
+Identificador= [a-zA-Z][A-Za-z0-9]*
+Cadena       = \'[^\']*\'
+
 %% //fin de opciones
 /* -------------------- Reglas lexicas ------------------ */
 
@@ -41,6 +42,10 @@ Cadena = \'[^\']*\'
     "uses"      { return symbol(sym.USES); }
     "var"       { return symbol(sym.VAR); }
     "const"     { return symbol(sym.CONST); }
+    "type"      { return symbol(sym.TYPE); }
+    "integer"   { return symbol(sym.INTEGER); }
+    "real"      { return symbol(sym.REAL); }
+    "string"    { return symbol(sym.STRING); }
 
     /* -------- SÍMBOLOS -------- */
     ";"         { return symbol(sym.SEMI); }
@@ -49,20 +54,23 @@ Cadena = \'[^\']*\'
     "."         { return symbol(sym.PUNTO); }
     "("         { return symbol(sym.PA); }
     ")"         { return symbol(sym.PC); }
+    "["         { return symbol(sym.CORI); }
+    "]"         { return symbol(sym.CORD); }
     "="         { return symbol(sym.IGUAL); }
     "+"         { return symbol(sym.MAS); }
     "-"         { return symbol(sym.MENOS); }
     "*"         { return symbol(sym.POR); }
     "/"         { return symbol(sym.DIV); }
+    ".."        { return symbol(sym.RANGO); }
 
     /* -------- LITERALES -------- */
-   {Cadena} {
-    String s = yytext().substring(1, yytext().length()-1); // quitar las comillas
-    return symbol(sym.CADENA, s);
-}
+    {Cadena} {
+        String s = yytext().substring(1, yytext().length()-1); // quitar comillas
+        return symbol(sym.CADENA, s);
+    }
 
-    {NumReal}   { return symbol(sym.NUM, yytext()); }
-    {Entero}    { return symbol(sym.NUM, yytext()); }
+    {NumReal}   { return symbol(sym.REALNUM, yytext()); }
+    {Entero}    { return symbol(sym.INTNUM, yytext()); }
     {Identificador} { return symbol(sym.ID, yytext()); }
 
     /* -------- COMENTARIOS -------- */

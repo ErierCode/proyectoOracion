@@ -1,4 +1,17 @@
-program HolaMundo;
+program demo;
+uses crt, graph, math;
+
+var nota1, nota2, nota3: integer;
+    promedio, media, moda: real;
+    nombres, apellidos: string;
+
+const IVA = 1.12;
+      ISR = 1.5;
+
+type cadena = string[35];
+     meses = 1..12;
+
 begin
-  writeln('¡Hola, Mundo!');
+  writeln('Hola mundo');
 end.
+

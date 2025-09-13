@@ -38,18 +38,22 @@ parser code {:
 
 /* ------------------- TERMINALES ------------------- */
 // Palabras reservadas
-terminal PROGRAM, BEGIN, END, WRITELN, WRITE, USES, VAR, CONST;
+terminal PROGRAM, BEGIN, END, WRITELN, WRITE, USES, VAR, CONST, TYPE;
+terminal INTEGER, REAL, STRING;
 
 // Símbolos
-terminal SEMI, DP, COMA, PUNTO, PA, PC, IGUAL, MAS, MENOS, POR, DIV;
+terminal SEMI, DP, COMA, PUNTO, PA, PC, CORI, CORD, IGUAL, MAS, MENOS, POR, DIV, RANGO;
 
 // Literales
 terminal String ID;
 terminal String CADENA;
-terminal String NUM;
+terminal String REALNUM;
+terminal String INTNUM;
 
 /* ------------------- NO TERMINALES ------------------- */
-non terminal S, Programa, Bloque, Sentencias, Sentencia, LlamadaWrite, ListaExpr, Expr;
+non terminal S, Programa, Bloque, Declaraciones, Librerias, Vars, Consts, Tipos;
+non terminal ListaVar, DeclaracionVar, ListaID, ListaConst, ListaTipo, TipoBase, Rango, ValorConst;
+non terminal Sentencias, Sentencia, LlamadaWrite, ListaExpr, Expr;
 
 /* ------------------- PRECEDENCIAS ------------------- */
 precedence left MAS, MENOS;
@@ -60,32 +64,73 @@ start with S;
 
 S ::= Programa PUNTO;
 
-Programa ::= PROGRAM ID SEMI Bloque;
+Programa ::= PROGRAM ID SEMI Declaraciones Bloque ;
 
+Declaraciones ::= Librerias Vars Consts Tipos
+                | Librerias Vars Consts
+                | Librerias Vars
+                | Librerias
+                | /* vacío */ ;
+
+Librerias ::= USES ListaID SEMI ;
+
+/* -------- VARIABLES -------- */
+Vars ::= VAR ListaVar ;
+
+ListaVar ::= ListaVar DeclaracionVar
+           | DeclaracionVar ;
+
+DeclaracionVar ::= ListaID DP TipoBase SEMI ;
+
+ListaID ::= ID
+          | ListaID COMA ID ;
+
+TipoBase ::= INTEGER
+           | REAL
+           | STRING
+           | STRING CORI INTNUM CORD    // string[35]
+           | Rango
+           | ID ;
+
+Rango ::= INTNUM RANGO INTNUM ;
+
+/* -------- CONSTANTES -------- */
+Consts ::= CONST ListaConst ;
+
+ListaConst ::= ListaConst ID IGUAL ValorConst SEMI
+             | ID IGUAL ValorConst SEMI ;
+
+ValorConst ::= INTNUM
+             | REALNUM
+             | CADENA ;
+
+/* -------- TIPOS -------- */
+Tipos ::= TYPE ListaTipo ;
+
+ListaTipo ::= ListaTipo ID IGUAL TipoBase SEMI
+            | ID IGUAL TipoBase SEMI ;
+
+/* ------------------- BLOQUE ------------------- */
 Bloque ::= BEGIN Sentencias END
-         | BEGIN END
-         ;
+         | BEGIN END ;
 
+/* ------------------- SENTENCIAS ------------------- */
 Sentencias ::= Sentencias Sentencia SEMI
-             | Sentencia SEMI
-             ;
+             | Sentencia SEMI ;
 
-Sentencia ::= LlamadaWrite
-            ;
+Sentencia ::= LlamadaWrite ;
 
 LlamadaWrite ::= WRITELN PA ListaExpr PC
-               | WRITE   PA ListaExpr PC
-               ;
+               | WRITE   PA ListaExpr PC ;
 
 ListaExpr ::= Expr
-            | ListaExpr COMA Expr
-            ;
+            | ListaExpr COMA Expr ;
 
 Expr ::= CADENA
        | ID
-       | NUM
+       | INTNUM
+       | REALNUM
        | Expr MAS Expr
        | Expr MENOS Expr
        | Expr POR Expr
-       | Expr DIV Expr
-       ;
+       | Expr DIV Expr ;
